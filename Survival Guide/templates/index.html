@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survival Guide - Programación Móvil</title>
+    <meta name="description" content="Guía interactiva de supervivencia para la materia de Programación Móvil">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+
+    <div class="bg-grid"></div>
+
+    <header class="top-bar">
+        <div class="top-bar-inner">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='img/pin-compra.gif') }}" alt="Survival Guide">
+                <span class="logo-text">SURVIVAL GUIDE</span>
+            </div>
+            <div class="progress-box">
+                <span id="progress-text" class="progress-label">0%</span>
+                <div class="progress-track header-progress">
+                    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <img src="{{ url_for('static', filename='img/survival.png') }}" alt="Survival Guide" class="hero-logo">
+        <span class="subtitle-badge">⚡ Cuatrimestre Mayo-Agosto 2026</span>
+        <h1>Programación Móvil</h1>
+        <p>Has entrado al calabozo de la Programación Móvil. Para sobrevivir este cuatrimestre, deberás dominar las
+            reglas, entender la evaluación, descubrir tus habilidades y conocer las fechas de tu destino.</p>
+    </section>
+
+    <div class="tabs-container">
+        <div class="tabs-wrapper">
+            {% for s in sections %}
+            <button class="tab-btn {% if loop.index0 == 0 %}active{% else %}locked{% endif %}"
+                id="nav-{{ loop.index0 }}" data-nav="{{ loop.index0 }}">
+                <div class="tab-icon">{{ s.icon|safe }}</div>
+                <span class="tab-label">{{ s.title }}</span>
+                <span class="tab-status">
+                    {% if loop.index0 == 0 %}
+                    <img src="/static/img/emotes/like.gif" class="status-gif"> Disponible
+                    {% else %}
+                    <img src="/static/img/emotes/deny.gif" class="status-gif"> Bloqueado
+                    {% endif %}
+                </span>
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <main class="main-content">
+        {% for s in sections %}
+        <div class="section-panel {% if loop.index0 != 0 %}hidden{% endif %}" id="panel-{{ loop.index0 }}">
+
+            <div class="section-header">
+                <div class="section-icon {{ s.color }}">{{ s.icon|safe }}</div>
+                <div>
+                    <h2 class="section-title">{{ s.title }}</h2>
+                    <p class="section-subtitle">Sección {{ loop.index }} de 4</p>
+                </div>
+            </div>
+
+            <div class="content-reading-wrapper" id="reading-{{ loop.index0 }}">
+
+                <div class="story-text">{{ s.story }}</div>
+
+                {% if loop.index0 == 0 %}
+                <div class="content-grid">
+                    {% for rule in s.content %}
+                    <div class="rule-card">
+                        <div class="rule-icon">{{ rule.icon|safe }}</div>
+                        <div>
+                            <h3 class="rule-title">{{ rule.title }}</h3>
+                            <p class="rule-desc">{{ rule.desc }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if loop.index0 == 1 %}
+                <div class="eval-section">
+                    {% for item in s.content %}
+                    <div class="eval-bar-container">
+                        <div class="eval-label">
+                            <span>{{ item.name }} <span class="eval-detail">— {{ item.detail }}</span></span>
+                            <span class="eval-pct">{{ item.pct }}%</span>
+                        </div>
+                        <div class="eval-track">
+                            <div class="eval-fill" data-width="{{ item.pct }}%"
+                                data-gradient="{{ item.gradient }}" style="width:0%"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% if s.dates %}
+                    <div class="eval-dates">
+                        <img src="/static/img/emotes/clap.gif" class="inline-gif"> {{ s.dates }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if loop.index0 == 2 %}
+                <div class="rule-card objective-card">
+                    <div class="rule-icon">
+                        <img src="/static/img/emotes/gg.gif" class="brawl-pin" alt="gg">
+                    </div>
+                    <div>
+                        <h3 class="rule-title">Objetivo General</h3>
+                        <p class="rule-desc">{{ s.objective }}</p>
+                    </div>
+                </div>
+                <h3 class="skills-heading">Objetivos Particulares</h3>
+                <div class="skill-grid">
+                    {% for sk in s.content %}
+                    <div class="skill-card">
+                        <div class="skill-icon">{{ sk.icon|safe }}</div>
+                        <span class="skill-name">{{ sk.name }}</span>
+                        <p class="skill-desc">{{ sk.desc }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if loop.index0 == 3 %}
+                <div class="timeline">
+                    {% for t in s.content %}
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <span class="timeline-week">{{ t.week }}</span>
+                        <h4 class="timeline-title">{{ t.title }}</h4>
+                        <p class="timeline-desc">{{ t.desc }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <button class="accept-btn" id="accept-btn-{{ loop.index0 }}" data-sec="{{ loop.index0 }}">
+                    <img src="/static/img/emotes/like.gif" class="btn-gif"> He leído y acepto — Continuar a las
+                    preguntas
+                </button>
+            </div>
+
+            {% set sec_idx = loop.index0 %}
+            <div class="quiz-section quiz-locked" id="quiz-{{ sec_idx }}">
+
+                <h3 class="quiz-title">
+                    <img src="/static/img/emotes/think.gif" class="inline-gif"> Prueba de Conocimiento
+                </h3>
+
+                {% for q in quizzes[sec_idx].questions %}
+                {% set q_idx = loop.index0 %}
+                <div class="question-card">
+                    <p class="question-text">{{ loop.index }}. {{ q.text }}</p>
+                    {% for opt in q.options %}
+                    <button class="option-btn" data-sec="{{ sec_idx }}" data-qi="{{ q_idx }}"
+                        data-oi="{{ loop.index0 }}">
+                        {{ opt }}
+                    </button>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+
+                <button class="submit-quiz-btn" id="submit-btn-{{ sec_idx }}" disabled data-sec="{{ sec_idx }}">
+                    <img src="/static/img/emotes/egg.gif" class="btn-gif"> VERIFICAR RESPUESTAS
+                </button>
+
+                <div id="result-{{ sec_idx }}"></div>
+
+                <div class="commitment-box hidden" id="commitment-{{ sec_idx }}">
+                    <input type="checkbox" id="cb-{{ sec_idx }}" data-sec="{{ sec_idx }}">
+                    <label for="cb-{{ sec_idx }}">
+                        <strong>Check de Compromiso:</strong> Me comprometo a cumplir con lo establecido en esta
+                        sección y a dar mi mejor esfuerzo en Programación Móvil.
+                    </label>
+                </div>
+
+                {% if sec_idx < 3 %}
+                <button class="next-btn hidden" id="next-btn-{{ sec_idx }}" disabled data-sec="{{ sec_idx }}">
+                    Continuar a la siguiente sección <img src="/static/img/emotes/angel.gif" class="btn-gif">
+                </button>
+                {% else %}
+                <button class="next-btn hidden" id="next-btn-{{ sec_idx }}" disabled data-sec="{{ sec_idx }}">
+                    <img src="/static/img/emotes/spike.gif" class="btn-gif"> ¡Completar la Aventura!
+                </button>
+                {% endif %}
+            </div>
+
+        </div>
+        {% endfor %}
+    </main>
+
+    <div class="victory-overlay hidden" id="victory-screen">
+        <div class="victory-card">
+            <div class="trophy">
+                <img src="/static/img/emotes/spike.gif" class="trophy-gif" alt="trophy">
+            </div>
+            <h2>¡AVENTURA COMPLETADA!</h2>
+            <p>Has dominado todas las secciones de Programación Móvil.</p>
+            <p>Estás listo para sobrevivir el cuatrimestre. ¡Buena suerte, aventurero!</p>
+            <div class="victory-buttons">
+                <button class="next-btn" id="restart-btn">
+                    <img src="/static/img/emotes/melting.gif" class="btn-gif"> Volver a empezar
+                </button>
+                <button class="next-btn" id="close-victory-btn">
+                    <img src="/static/img/emotes/counter.gif" class="btn-gif"> Salir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var state = {
+            current: 0,
+            unlocked: [true, false, false, false],
+            quizPassed: [false, false, false, false],
+            committed: [false, false, false, false],
+            completed: [false, false, false, false],
+            answers: [{}, {}, {}, {}],
+            submitted: [false, false, false, false],
+            accepted: [false, false, false, false]
+        };
+
+        function acceptSection(sec) {
+            state.accepted[sec] = true;
+            var reading = document.getElementById('reading-' + sec);
+            if (reading) reading.classList.add('hidden');
+            var quiz = document.getElementById('quiz-' + sec);
+            if (quiz) quiz.classList.remove('quiz-locked');
+            quiz.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function navigateTo(i) {
+            if (!state.unlocked[i]) return;
+            state.current = i;
+            document.querySelectorAll('.section-panel').forEach(function (el, idx) {
+                el.classList.toggle('hidden', idx !== i);
+            });
+            updateNav();
+            if (i === 1) animateEvalBars();
+        }
+
+        function updateNav() {
+            document.querySelectorAll('.tab-btn').forEach(function (el, i) {
+                el.classList.remove('active', 'locked', 'completed');
+                if (i === state.current) el.classList.add('active');
+                if (!state.unlocked[i]) el.classList.add('locked');
+                if (state.completed[i]) el.classList.add('completed');
+
+                var st = el.querySelector('.tab-status');
+                if (state.completed[i]) {
+                    st.innerHTML = '<img src="/static/img/emotes/gg.gif" class="status-gif"> Completado';
+                } else if (state.unlocked[i]) {
+                    st.innerHTML = '<img src="/static/img/emotes/like.gif" class="status-gif"> Disponible';
+                } else {
+                    st.innerHTML = '<img src="/static/img/emotes/deny.gif" class="status-gif"> Bloqueado';
+                }
+            });
+        }
+
+        function selectOption(sec, qi, oi) {
+            if (state.submitted[sec]) return;
+            state.answers[sec][qi] = oi;
+            var cards = document.querySelectorAll('#quiz-' + sec + ' .question-card');
+            cards[qi].querySelectorAll('.option-btn').forEach(function (b, idx) {
+                b.classList.toggle('selected', idx === oi);
+            });
+            checkCanSubmit(sec);
+        }
+
+        function checkCanSubmit(sec) {
+            var total = document.querySelectorAll('#quiz-' + sec + ' .question-card').length;
+            var answered = Object.keys(state.answers[sec]).length;
+            document.getElementById('submit-btn-' + sec).disabled = answered < total;
+        }
+
+        function submitQuiz(sec) {
+            if (state.submitted[sec]) return;
+            fetch('/api/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ section: sec, answers: state.answers[sec] })
+            })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    state.submitted[sec] = true;
+                    state.quizPassed[sec] = data.passed;
+
+                    var cards = document.querySelectorAll('#quiz-' + sec + ' .question-card');
+                    for (var qi in data.results) {
+                        var res = data.results[qi];
+                        cards[qi].querySelectorAll('.option-btn').forEach(function (b, oi) {
+                            b.classList.remove('selected');
+                            if (oi === res.correct) b.classList.add('correct');
+                            else if (oi === res.chosen && !res.is_correct) b.classList.add('wrong');
+                            b.style.pointerEvents = 'none';
+                        });
+                    }
+
+                    var resEl = document.getElementById('result-' + sec);
+                    if (data.passed) {
+                        resEl.innerHTML =
+                            '<div class="quiz-result passed">' +
+                            '<img src="/static/img/emotes/angel.gif" class="result-gif">' +
+                            '<p class="result-text">¡Aprobado! ' + data.correct + '/' + data.total + ' correctas</p>' +
+                            '<p class="result-sub">Acepta el compromiso para continuar.</p>' +
+                            '</div>';
+                        document.getElementById('commitment-' + sec).classList.remove('hidden');
+                    } else {
+                        resEl.innerHTML =
+                            '<div class="quiz-result failed">' +
+                            '<img src="/static/img/emotes/dead.gif" class="result-gif">' +
+                            '<p class="result-text">No aprobado: ' + data.correct + '/' + data.total + '</p>' +
+                            '<p class="result-sub">Necesitas al menos ' + data.required + ' correctas.</p>' +
+                            '</div>' +
+                            '<button class="retry-btn" onclick="retryQuiz(' + sec + ')"><img src="/static/img/emotes/reverse.gif" class="btn-gif"> Reintentar</button>';
+                    }
+                    document.getElementById('submit-btn-' + sec).classList.add('hidden');
+                    updateProgress();
+                });
+        }
+
+        function retryQuiz(sec) {
+            state.submitted[sec] = false;
+            state.quizPassed[sec] = false;
+            state.answers[sec] = {};
+            document.querySelectorAll('#quiz-' + sec + ' .option-btn').forEach(function (b) {
+                b.classList.remove('selected', 'correct', 'wrong');
+                b.style.pointerEvents = '';
+            });
+            document.getElementById('result-' + sec).innerHTML = '';
+            document.getElementById('commitment-' + sec).classList.add('hidden');
+            var btn = document.getElementById('submit-btn-' + sec);
+            btn.classList.remove('hidden');
+            btn.disabled = true;
+        }
+
+        function toggleCommitment(sec) {
+            state.committed[sec] = document.getElementById('cb-' + sec).checked;
+            var nextBtn = document.getElementById('next-btn-' + sec);
+            nextBtn.classList.toggle('hidden', !state.committed[sec]);
+            nextBtn.disabled = !state.committed[sec];
+        }
+
+        function completeSection(sec) {
+            if (!state.committed[sec]) return;
+            state.completed[sec] = true;
+            if (sec < 3) { state.unlocked[sec + 1] = true; navigateTo(sec + 1); }
+            else { showVictory(); }
+            updateProgress();
+            updateNav();
+        }
+
+        function updateProgress() {
+            var pct = Math.round(state.completed.filter(Boolean).length / 4 * 100);
+            document.getElementById('progress-fill').style.width = pct + '%';
+            document.getElementById('progress-text').textContent = pct + '%';
+        }
+
+        function showVictory() {
+            document.getElementById('victory-screen').classList.remove('hidden');
+        }
+
+        function closeVictory() {
+            document.getElementById('victory-screen').classList.add('hidden');
+        }
+
+        function restartTest() {
+            state.current = 0;
+            state.unlocked = [true, false, false, false];
+            state.quizPassed = [false, false, false, false];
+            state.committed = [false, false, false, false];
+            state.completed = [false, false, false, false];
+            state.answers = [{}, {}, {}, {}];
+            state.submitted = [false, false, false, false];
+            state.accepted = [false, false, false, false];
+
+            for (var s = 0; s < 4; s++) {
+                retryQuiz(s);
+                var cb = document.getElementById('cb-' + s);
+                if (cb) cb.checked = false;
+                var nextBtn = document.getElementById('next-btn-' + s);
+                if (nextBtn) { nextBtn.classList.add('hidden'); nextBtn.disabled = true; }
+                var reading = document.getElementById('reading-' + s);
+                if (reading) reading.classList.remove('hidden');
+                var quiz = document.getElementById('quiz-' + s);
+                if (quiz) quiz.classList.add('quiz-locked');
+            }
+
+            document.getElementById('victory-screen').classList.add('hidden');
+            updateProgress();
+            updateNav();
+            navigateTo(0);
+        }
+
+        function animateEvalBars() {
+            document.querySelectorAll('.eval-fill').forEach(function (bar) {
+                if (bar.dataset.gradient) bar.style.background = bar.dataset.gradient;
+                setTimeout(function () { bar.style.width = bar.dataset.width; }, 200);
+            });
+        }
+
+        // Eventos
+        document.querySelectorAll('.tab-btn[data-nav]').forEach(function (el) {
+            el.addEventListener('click', function () {
+                navigateTo(parseInt(el.dataset.nav));
+            });
+        });
+
+        document.querySelectorAll('.option-btn[data-sec]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                selectOption(parseInt(btn.dataset.sec), parseInt(btn.dataset.qi), parseInt(btn.dataset.oi));
+            });
+        });
+
+        document.querySelectorAll('.submit-quiz-btn[data-sec]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                submitQuiz(parseInt(btn.dataset.sec));
+            });
+        });
+
+        document.querySelectorAll('.commitment-box input[data-sec]').forEach(function (cb) {
+            cb.addEventListener('change', function () {
+                toggleCommitment(parseInt(cb.dataset.sec));
+            });
+        });
+
+        document.querySelectorAll('.next-btn[data-sec]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                completeSection(parseInt(btn.dataset.sec));
+            });
+        });
+
+        document.querySelectorAll('.accept-btn[data-sec]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                acceptSection(parseInt(btn.dataset.sec));
+            });
+        });
+
+        document.getElementById('close-victory-btn').addEventListener('click', closeVictory);
+        document.getElementById('restart-btn').addEventListener('click', restartTest);
+
+        document.querySelectorAll('.eval-fill[data-gradient]').forEach(function (bar) {
+            bar.style.background = bar.dataset.gradient;
+        });
+    </script>
+
+</body>
+
+</html>
