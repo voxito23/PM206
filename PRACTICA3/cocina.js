@@ -143,9 +143,6 @@ function buscarProductoPorNombre(nombreBuscado) {
 function buscarProductoPorId(id) {
   return productos.find(p => p.id === Number(id));
 }
-
-
-
 let promociones = [];
 function agregarPromocion(idProducto, descuento, descripcion) {
   let producto = productos.find(p => p.id === Number(idProducto));
