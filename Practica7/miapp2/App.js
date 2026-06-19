@@ -1,50 +1,43 @@
-/* ZONA 1: IMPORTACIONES DE COMPONENTES Y ARCHIVOS */
+/* Zona 1: Importaciones de componentes y archivos */
+
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Perfil } from './components/perfil';
 
-
-
-/* ZONA 2: MAIN - HOGAR DE LOS COMPONENTES */
+/* Zona 2: Main - Hogar de los componentes */
 
 export default function App() {
   return (
     <View style={styles.container}>
 
-      <View style={{ alignItems: 'flex-start' }}>
-        <Perfil nombre="Victor Hernandez" 
-        carrera="Ingeniería de Sistemas Computacionales" 
-        materia="Programación Móvil"  
-        cuatri="9" 
-        ></Perfil> 
-        
-        <Text>----------------------------------------</Text>
-        <Text>----------------------------------------</Text>
+      {/* <MenuScreen/> */}
 
-        <Perfil nombre="Belen Vega" 
-        carrera="Ingeniería de Sistemas Computacionales" 
-        materia="Programación Movil"  
-        cuatri="9" 
-        ></Perfil>  
-      </View> 
+      <Perfil estiloE={styles.tarjetaRoja} nombre="Victor" carrera="Sistemas" materia="Programacion Móvil" Cuatrimestre ="9no"/>
+      <Perfil estiloE={styles.tarjetaVerde} nombre="Belen" carrera="Sistemas" materia="Programacion Móvil" Cuatrimestre="9no" />
+      <Perfil estiloE={styles.tarjetaRoja} nombre="Mau" carrera="Sistemas" materia="Programacion Móvil" Cuatrimestre="9no"/>
 
       <StatusBar style="auto" />
+
     </View>
   );
 }
 
-
-
-/* ZONA 3: ESTILOS Y POSICIONAMIENTOS */
+/* Zona 3: Estilos y posicionamiento */
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
+    flexDirection: 'row',
+    
+    justifyContent: 'flex-start',
     justifyContent: 'center',
+    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
+    justifyContent: 'space-around',
+    justifyContent: 'space-evenly',
   },
+  tarjetaRoja: { backgroundColor: '#FF6B6B' },
+  tarjetaVerde: { backgroundColor: '#2bc520ff' },
 });
-
-
-

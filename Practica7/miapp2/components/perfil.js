@@ -1,41 +1,57 @@
-/* Perfil usando Desetructuracion*/
+/*Perfil Usando Props */
+
+import { Text, View, Button, StyleSheet 
+  
+} from 'react-native';
+
 import React, { useState } from 'react';
-import { View, Text, Button } from 'react-native';
 
-export const Perfil = ({ nombre, carrera, materia, cuatri }) => {
-    const [mostrar, setMostrar] = useState(false);
+const estiolos = StyleSheet.create({
+  nombre: {
+    fontSize: 24,
+    fontWeight: '700',
+    textTransform: "uppercase"
+  },
 
-    return (
-        <View>
-            <Text>{nombre}</Text>
+  carrera: {
+    fontSize: 18,
+    color: 'blue',
+    fontFamily: 'Arial'
+  },
 
-            {mostrar && (
-                <>
-                    <Text>{carrera}</Text>
-                    <Text>{materia}</Text>
-                    <Text>{cuatri}</Text>
-                </>
-            )}
+  otroTexto: {
+    fontSize: 12,
+    fontFamily: 'Courier',
+    fontStyle: 'italic'
+  },
 
-            <Button
-                title="Mostrar Perfil"
-                onPress={() => setMostrar(!mostrar)}
-            />
-        </View>
-    );
+  tarjeta: {
+    borderWidth: 3,
+    margin: 20,
+    padding: 25,
+  }
+});
+
+/*Perfil Usando destructuración */
+export const Perfil = ({ nombre, carrera, materia, semestre, estiloE }) => {
+  const [mostrar, setMostrar] = useState(false);
+
+  return (
+    <View style={[estiolos.tarjeta, estiloE]}>
+      <Text style={estiolos.nombre}>{nombre}</Text>
+
+      {mostrar && (
+        <>
+          <Text style={estiolos.carrera}>{carrera} </Text>
+          <Text style={estiolos.otroTexto}>{materia}</Text>
+          <Text style={estiolos.otroTexto}>{semestre}</Text>
+        </>
+      )}
+
+      <Button
+        title="Ver perfil"
+        onPress={() => setMostrar(!mostrar)}
+      />
+    </View>
+  );
 };
-/*perfil usando props
-import { View, Text } from 'react-native';
-
-export const Perfil = (props) => {
-    return (
-        <View>
-            <Text>{props.nombre}</Text>
-            <Text>{props.carrera}</Text>
-            <Text>{props.materia}</Text>
-            <Text>{props.cuatri}</Text>
-        </View>
-    );
-};
-*/
-
