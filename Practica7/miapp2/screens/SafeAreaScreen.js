@@ -73,7 +73,9 @@ const styles = StyleSheet.create({
   fondo: {
     flex: 1,
     backgroundColor: '#1a1a2e',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    paddingTop: 100,
   },
   titulo: {
     fontSize: 22,

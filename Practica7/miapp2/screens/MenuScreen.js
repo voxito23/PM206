@@ -41,14 +41,14 @@ export default function MenuScreen() {
 
   if (screen !== 'menu') {
     return (
-      <View style={{ flex: 1, backgroundColor: '#09090B' }}>
+      <View style={{ flex: 1 }}>
+        {renderScreen()}
         <TouchableOpacity 
-          style={styles.backButton} 
+          style={styles.floatingBackButton} 
           onPress={() => setScreen('menu')}
         >
           <Text style={styles.backText}>← Volver</Text>
         </TouchableOpacity>
-        {renderScreen()}
       </View>
     );
   }
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  backButton: {
+  floatingBackButton: {
     position: 'absolute',
     top: Platform.OS === 'ios' ? 60 : 40,
     left: 20,
