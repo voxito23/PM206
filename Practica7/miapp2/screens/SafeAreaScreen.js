@@ -1,13 +1,13 @@
 /* Zona 1: Importaciones */
 import React, { useState } from 'react';
 import {
-  SafeAreaView,
   ScrollView,
   View,
   Text,
   StyleSheet,
   Switch,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 /* Zona 2: Componente */
 export default function SafeAreaScreen() {

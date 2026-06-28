@@ -2,19 +2,22 @@
 
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import MenuScreen from './screens/MenuScreen';
 
 /* Zona 2: Main - Hogar de los componentes */
 
 export default function App() {
   return (
-    <View style={styles.container}>
+    <SafeAreaProvider>
+      <View style={styles.container}>
 
-      <MenuScreen/>
+        <MenuScreen/>
 
-      <StatusBar style="auto" />
+        <StatusBar style="auto" />
 
-    </View>
+      </View>
+    </SafeAreaProvider>
   );
 }
 
