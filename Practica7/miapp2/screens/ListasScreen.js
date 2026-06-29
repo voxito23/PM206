@@ -1,3 +1,4 @@
+//Practica 14 FlatList y SectionList
 //zona1: importaciones de componentes y archivos
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, FlatList, Button, SectionList } from 'react-native';
