@@ -65,7 +65,6 @@ export default function MenuScreen() {
     ]).start();
   }, [backButtonOpacity, backButtonTranslateY]);
 
-  // ── Web: detectar scroll con rueda del mouse ──
   useEffect(() => {
     if (screen === 'menu') return;
 
@@ -86,7 +85,6 @@ export default function MenuScreen() {
     }
   }, [screen, ocultarBoton, mostrarBoton]);
 
-  // ── Móvil: detectar scroll con touch ──
   const handleTouchStart = (e) => {
     lastTouchY.current = e.nativeEvent.pageY;
   };
@@ -104,7 +102,6 @@ export default function MenuScreen() {
     }
   };
 
-  // Resetear animación al volver al menú
   const volverAlMenu = () => {
     backButtonOpacity.setValue(1);
     backButtonTranslateY.setValue(0);
