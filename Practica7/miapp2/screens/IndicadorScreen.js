@@ -1,13 +1,104 @@
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, View, TextInput, Button, KeyboardAvoidingView, 
+ActivityIndicator, Platform, Image } from 'react-native';
 
-export default function IndicadorScreen() {
+export default function ActivityIndicatorScreen() {
+  const [nombre, setNombre] = useState('');
+  const [carrera, setCarrera] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleGuardar = () => {
+    if (nombre.trim() === '' || carrera.trim() === '') {
+      alert('Por favor, llena todos los campos.');
+      return;
+    }
+
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      alert(`Perfil de ${nombre} guardado con exito`);
+      
+      setNombre('');
+      setCarrera('');
+    }, 3000);
+  };
+
   return (
     <View style={styles.container}>
-      <Text>ActivityIndicator & KeyboardAvoidingView</Text>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+        style={styles.formContainer}
+      >
+        <View style={styles.formContainerInner}>
+          <View style={styles.formBody}>
+            <Text style={styles.titulo}>Agregar Perfil</Text>
+            <TextInput 
+              style={styles.input} 
+              placeholder="Nombre completo" 
+              value={nombre}
+              onChangeText={setNombre}
+            />
+            <TextInput 
+              style={styles.input} 
+              placeholder="Carrera" 
+              value={carrera}
+              onChangeText={setCarrera}
+            />
+          </View>
+          <View style={styles.actionArea}>
+            {isLoading ? (
+              <ActivityIndicator size="large" color="black" style={styles.loader} />
+            ) : (
+              <Button title="Guardar Perfil" onPress={handleGuardar} color="black" />
+            )}
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+      <StatusBar style="auto" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  container: {
+    flex: 1,
+    backgroundColor: '#f9f9f9',
+  },
+  formContainer: {
+    flex: 1, 
+  },
+  formContainerInner: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'space-between', 
+  },
+  formBody: {
+    flex: 1, 
+    justifyContent: 'center', 
+  },
+  actionArea: {
+    paddingTop: 10,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 10,
+  },
+  titulo: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#333',
+  },
+  input: {
+    height: 50, 
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 15,
+    paddingHorizontal: 15,
+    backgroundColor: '#fff',
+    fontSize: 16,
+  },
+  loader: {
+    marginVertical: 10,
+  }
 });
