@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Platform } from 'react-native';
-import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Platform, Animated } from 'react-native';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 import TarjetasScreen from './TarjetasScreen';
 import SafeAreaScreen from './SafeAreaScreen';
@@ -24,6 +24,93 @@ const MENU_ITEMS = [
 
 export default function MenuScreen() {
   const [screen, setScreen] = useState('menu');
+  const backButtonOpacity = useRef(new Animated.Value(1)).current;
+  const backButtonTranslateY = useRef(new Animated.Value(0)).current;
+  const lastTouchY = useRef(0);
+  const wrapperRef = useRef(null);
+  const isHidden = useRef(false);
+
+  // Funciones reutilizables para ocultar/mostrar
+  const ocultarBoton = useCallback(() => {
+    if (isHidden.current) return;
+    isHidden.current = true;
+    Animated.parallel([
+      Animated.timing(backButtonOpacity, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+      Animated.timing(backButtonTranslateY, {
+        toValue: -60,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [backButtonOpacity, backButtonTranslateY]);
+
+  const mostrarBoton = useCallback(() => {
+    if (!isHidden.current) return;
+    isHidden.current = false;
+    Animated.parallel([
+      Animated.timing(backButtonOpacity, {
+        toValue: 1,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+      Animated.timing(backButtonTranslateY, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [backButtonOpacity, backButtonTranslateY]);
+
+  // ── Web: detectar scroll con rueda del mouse ──
+  useEffect(() => {
+    if (screen === 'menu') return;
+
+    const node = wrapperRef.current;
+    if (!node) return;
+
+    const handleWheel = (e) => {
+      if (e.deltaY > 5) {
+        ocultarBoton();
+      } else if (e.deltaY < -5) {
+        mostrarBoton();
+      }
+    };
+
+    if (node.addEventListener) {
+      node.addEventListener('wheel', handleWheel, { passive: true });
+      return () => node.removeEventListener('wheel', handleWheel);
+    }
+  }, [screen, ocultarBoton, mostrarBoton]);
+
+  // ── Móvil: detectar scroll con touch ──
+  const handleTouchStart = (e) => {
+    lastTouchY.current = e.nativeEvent.pageY;
+  };
+
+  const handleTouchMove = (e) => {
+    const currentY = e.nativeEvent.pageY;
+    const diff = currentY - lastTouchY.current;
+
+    if (diff < -8) {
+      ocultarBoton();
+      lastTouchY.current = currentY;
+    } else if (diff > 8) {
+      mostrarBoton();
+      lastTouchY.current = currentY;
+    }
+  };
+
+  // Resetear animación al volver al menú
+  const volverAlMenu = () => {
+    backButtonOpacity.setValue(1);
+    backButtonTranslateY.setValue(0);
+    isHidden.current = false;
+    setScreen('menu');
+  };
 
   const renderScreen = () => {
     switch (screen) {
@@ -41,14 +128,26 @@ export default function MenuScreen() {
 
   if (screen !== 'menu') {
     return (
-      <View style={{ flex: 1 }}>
+      <View
+        ref={wrapperRef}
+        style={{ flex: 1 }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+      >
         {renderScreen()}
-        <TouchableOpacity 
-          style={styles.floatingBackButton} 
-          onPress={() => setScreen('menu')}
+        <Animated.View
+          style={[
+            styles.floatingBackButton,
+            {
+              opacity: backButtonOpacity,
+              transform: [{ translateY: backButtonTranslateY }],
+            },
+          ]}
         >
-          <Text style={styles.backText}>← Volver</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={volverAlMenu}>
+            <Text style={styles.backText}>← Volver</Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
     );
   }
