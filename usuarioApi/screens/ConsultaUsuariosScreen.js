@@ -1,16 +1,63 @@
-import React from 'react';
-import {SafeAreaView,View,Text,FlatList,StyleSheet,
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from 'expo-router';
+import Constants from 'expo-constants';
+
+const getApiUrl = () => {
+  if (Platform.OS === 'web') {
+    return 'http://localhost:5000/v1/usuarios/';
+  }
+
+  const hostUri =
+    Constants.expoConfig?.hostUri ||
+    Constants.manifest2?.extra?.expoClient?.hostUri ||
+    Constants.manifest?.debuggerHost;
+
+  if (hostUri) {
+    const ip = hostUri.split(':')[0];
+    if (ip && ip !== 'localhost' && ip !== '127.0.0.1') {
+      return `http://${ip}:5000/v1/usuarios/`;
+    }
+  }
+
+  return Platform.OS === 'android'
+    ? 'http://10.0.2.2:5000/v1/usuarios/'
+    : 'http://localhost:5000/v1/usuarios/';
+};
+
+const API_URL = getApiUrl();
 
 export default function ConsultaUsuariosScreen() {
 
-  const usuarios = [
-    { id: '1', nombre: 'Isay Guerra', edad: 22 },
-    { id: '2', nombre: 'Ana López', edad: 19 },
-    { id: '3', nombre: 'Carlos Gonzalez', edad: 25 },
-    { id: '4', nombre: 'Bjork Guerra', edad: 21 },
-    { id: '5', nombre: 'Luisa Martínez', edad: 28 },
-  ];
+  const [usuarios, setUsuarios] = useState([]);
+  const [cargando, setCargando] = useState(false);
+
+  const obtenerUsuarios = async () => {
+    try {
+      setCargando(true);
+      const respuesta = await fetch(API_URL);
+      const datos = await respuesta.json();
+      console.log("Respuesta de la API:", datos);
+      setUsuarios(datos.usuarios || []);
+    } catch (error) {
+      console.log("Error de la API:", error);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      obtenerUsuarios();
+    }, [])
+  );
 
   const renderTarjeta = ({ item }) => (
     <View style={styles.card}>
@@ -36,15 +83,24 @@ export default function ConsultaUsuariosScreen() {
 
       <FlatList
         data={usuarios}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={renderTarjeta}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
+        refreshing={cargando}
+        onRefresh={obtenerUsuarios}
+        ListEmptyComponent={
+          !cargando ? (
+            <Text style={styles.vacioTexto}>
+              No hay usuarios registrados aún.
+            </Text>
+          ) : null
+        }
       />
 
     </SafeAreaView>
   );
-  
+
 }
 
 const styles = StyleSheet.create({
@@ -53,10 +109,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F7FA',
     padding: 20,
+    paddingTop: Platform.OS === 'android' ? 40 : 20,
   },
 
   titulo: {
-    fontSize: 28,
+    fontSize: Platform.OS === 'android' ? 24 : 28,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#1F2937',
@@ -68,15 +125,20 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 18,
     marginBottom: 15,
-    elevation: 4,
-
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 5,
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
+    ...Platform.select({
+      android: {
+        elevation: 4,
+      },
+      ios: {
+        shadowColor: '#000',
+        shadowOpacity: 0.15,
+        shadowRadius: 5,
+        shadowOffset: {
+          width: 0,
+          height: 3,
+        },
+      },
+    }),
   },
 
   nombre: {
@@ -94,6 +156,13 @@ const styles = StyleSheet.create({
   info: {
     fontSize: 16,
     color: '#4B5563',
+  },
+
+  vacioTexto: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#6B7280',
+    marginTop: 40,
   },
 
 });
