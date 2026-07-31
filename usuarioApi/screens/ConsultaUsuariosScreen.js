@@ -5,9 +5,10 @@ import {
   FlatList,
   StyleSheet,
   Platform,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 
 const getApiUrl = () => {
@@ -35,7 +36,7 @@ const getApiUrl = () => {
 const API_URL = getApiUrl();
 
 export default function ConsultaUsuariosScreen() {
-
+  const router = useRouter();
   const [usuarios, setUsuarios] = useState([]);
   const [cargando, setCargando] = useState(false);
 
@@ -69,6 +70,22 @@ export default function ConsultaUsuariosScreen() {
       <Text style={styles.info}>
         Edad: {item.edad} años
       </Text>
+
+      <Pressable
+        style={styles.botonDetalle}
+        onPress={() => {
+          router.push({
+            pathname: '/detalles',
+            params: {
+              id: String(item.id),
+              nombre: String(item.nombre),
+              edad: String(item.edad),
+            },
+          });
+        }}
+      >
+        <Text style={styles.textoBotonDetalle}>Ver detalle</Text>
+      </Pressable>
 
     </View>
   );
@@ -163,6 +180,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6B7280',
     marginTop: 40,
+  },
+
+  botonDetalle: {
+    backgroundColor: '#2563EB',
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 15,
+  },
+
+  textoBotonDetalle: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: 'bold',
   },
 
 });
