@@ -14,31 +14,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import Constants from 'expo-constants';
-
-const getApiUrl = () => {
-  if (Platform.OS === 'web') {
-    return 'http://localhost:5000/v1/usuarios/';
-  }
-
-  const hostUri =
-    Constants.expoConfig?.hostUri ||
-    Constants.manifest2?.extra?.expoClient?.hostUri ||
-    Constants.manifest?.debuggerHost;
-
-  if (hostUri) {
-    const ip = hostUri.split(':')[0];
-    if (ip && ip !== 'localhost' && ip !== '127.0.0.1') {
-      return `http://${ip}:5000/v1/usuarios/`;
-    }
-  }
-
-  return Platform.OS === 'android'
-    ? 'http://10.0.2.2:5000/v1/usuarios/'
-    : 'http://localhost:5000/v1/usuarios/';
-};
-
-const API_URL = getApiUrl();
+import { apiFetch, getApiErrorMessage } from '../config/api';
 
 export default function AltaUsuariosScreen() {
   const [nombre, setNombre] = useState('');
@@ -73,7 +49,7 @@ export default function AltaUsuariosScreen() {
 
     try {
       setCargando(true);
-      const respuesta = await fetch(API_URL, {
+      const respuesta = await apiFetch('', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +69,7 @@ export default function AltaUsuariosScreen() {
       setEdad('');
     } catch (error) {
       console.log('Error API', error);
-      mostrarMensaje('Error','No fue posible guardar el usuario.');
+      mostrarMensaje('Error', getApiErrorMessage(error));
     } finally {
       setCargando(false);
     }
@@ -121,6 +97,7 @@ export default function AltaUsuariosScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Nombre del usuario"
+                placeholderTextColor="#9CA3AF"
                 value={nombre}
                 onChangeText={setNombre}
               />
@@ -128,6 +105,7 @@ export default function AltaUsuariosScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Edad del usuario"
+                placeholderTextColor="#9CA3AF"
                 keyboardType="numeric"
                 value={edad}
                 onChangeText={setEdad}
@@ -160,12 +138,13 @@ const styles = StyleSheet.create({
 
       scrollContainer: {
         flexGrow: 1,
-        justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
+        paddingBottom: 80,
       },
 
       card: {
+        marginVertical: 'auto',
         width: '100%',
         backgroundColor: '#FFFFFF',
         padding: 25,
@@ -197,6 +176,7 @@ const styles = StyleSheet.create({
         marginBottom: 18,
         backgroundColor: '#F9FAFB',
         fontSize: 16,
+        color: '#111827',
       },
 
       boton: {

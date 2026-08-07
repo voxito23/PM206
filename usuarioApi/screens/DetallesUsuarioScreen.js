@@ -12,31 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import Constants from 'expo-constants';
-
-const getApiUrl = () => {
-  if (Platform.OS === 'web') {
-    return 'http://localhost:5000/v1/usuarios/';
-  }
-
-  const hostUri =
-    Constants.expoConfig?.hostUri ||
-    Constants.manifest2?.extra?.expoClient?.hostUri ||
-    Constants.manifest?.debuggerHost;
-
-  if (hostUri) {
-    const ip = hostUri.split(':')[0];
-    if (ip && ip !== 'localhost' && ip !== '127.0.0.1') {
-      return `http://${ip}:5000/v1/usuarios/`;
-    }
-  }
-
-  return Platform.OS === 'android'
-    ? 'http://10.0.2.2:5000/v1/usuarios/'
-    : 'http://localhost:5000/v1/usuarios/';
-};
-
-const API_URL = getApiUrl();
+import { apiFetch, getApiErrorMessage } from '../config/api';
 const AUTH_HEADER = 'Basic YWRtaW46MTIzNA==';
 
 export default function DetallesUsuarioScreen() {
@@ -69,7 +45,7 @@ export default function DetallesUsuarioScreen() {
 
     try {
       setEliminando(true);
-      const respuesta = await fetch(`${API_URL}${id}`, {
+      const respuesta = await apiFetch(id, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -87,7 +63,7 @@ export default function DetallesUsuarioScreen() {
       });
     } catch (error) {
       console.log('Error al eliminar usuario:', error);
-      mostrarMensaje('Error', 'No fue posible eliminar el usuario.');
+      mostrarMensaje('Error', getApiErrorMessage(error));
     } finally {
       setEliminando(false);
     }
@@ -119,12 +95,9 @@ export default function DetallesUsuarioScreen() {
 
           <View style={styles.linea}></View>
 
-          <Text style={styles.info}>
-            ID: #{id}
-          </Text>
 
           <Text style={styles.info}>
-            Edad: {edad} años
+            Edad: {edad}
           </Text>
 
           <Pressable
@@ -151,7 +124,7 @@ export default function DetallesUsuarioScreen() {
         </View>
       </ScrollView>
 
-      {/* Modal de confirmación para Eliminar */}
+      {/*Modal de confirmación para Eliminar*/}
       <Modal
         animationType="fade"
         transparent={true}
@@ -267,8 +240,6 @@ const styles = StyleSheet.create({
     color: '#4B5563',
     fontSize: 16,
   },
-
-  /* Estilos para Modal */
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -287,7 +258,7 @@ const styles = StyleSheet.create({
   modalTitulo: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#EF4444',
     marginBottom: 15,
     textAlign: 'center',
   },

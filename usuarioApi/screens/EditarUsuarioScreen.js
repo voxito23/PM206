@@ -15,31 +15,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import Constants from 'expo-constants';
-
-const getApiUrl = () => {
-  if (Platform.OS === 'web') {
-    return 'http://localhost:5000/v1/usuarios/';
-  }
-
-  const hostUri =
-    Constants.expoConfig?.hostUri ||
-    Constants.manifest2?.extra?.expoClient?.hostUri ||
-    Constants.manifest?.debuggerHost;
-
-  if (hostUri) {
-    const ip = hostUri.split(':')[0];
-    if (ip && ip !== 'localhost' && ip !== '127.0.0.1') {
-      return `http://${ip}:5000/v1/usuarios/`;
-    }
-  }
-
-  return Platform.OS === 'android'
-    ? 'http://10.0.2.2:5000/v1/usuarios/'
-    : 'http://localhost:5000/v1/usuarios/';
-};
-
-const API_URL = getApiUrl();
+import { apiFetch, getApiErrorMessage } from '../config/api';
 const AUTH_HEADER = 'Basic YWRtaW46MTIzNA==';
 
 export default function EditarUsuarioScreen() {
@@ -91,7 +67,7 @@ export default function EditarUsuarioScreen() {
 
     try {
       setCargando(true);
-      const respuesta = await fetch(`${API_URL}${id}`, {
+      const respuesta = await apiFetch(id, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -112,7 +88,7 @@ export default function EditarUsuarioScreen() {
       });
     } catch (error) {
       console.log('Error API al actualizar:', error);
-      mostrarMensaje('Error', 'No fue posible actualizar el usuario.');
+      mostrarMensaje('Error', getApiErrorMessage(error));
     } finally {
       setCargando(false);
     }
@@ -134,21 +110,23 @@ export default function EditarUsuarioScreen() {
             <View style={styles.card}>
 
               <Text style={styles.titulo}>
-                Editar Usuario #{id}
+                Editar Usuario
               </Text>
 
               <Text style={styles.label}>Nombre del usuario</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Nombre del usuario"
+                placeholderTextColor="#9CA3AF"
                 value={nombre}
                 onChangeText={setNombre}
               />
 
-              <Text style={styles.label}>Edad (años)</Text>
+              <Text style={styles.label}>Edad</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Edad del usuario"
+                placeholderTextColor="#9CA3AF"
                 keyboardType="numeric"
                 value={edad}
                 onChangeText={setEdad}
@@ -189,10 +167,11 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'center',
     padding: 20,
+    paddingBottom: 80, // Extra padding para asegurar que el botón de cancelar se pueda ver
   },
   card: {
+    marginVertical: 'auto',
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
     padding: 25,
@@ -224,6 +203,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     backgroundColor: '#F9FAFB',
     fontSize: 16,
+    color: '#111827',
   },
   boton: {
     backgroundColor: '#2563EB',

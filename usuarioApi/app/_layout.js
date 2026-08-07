@@ -1,8 +1,23 @@
+import { useState } from "react";
 import { Stack } from "expo-router";
+import SplashScreen from "../screens/SplashScreen";
 
 export default function RootLayout() {
+    const [showSplash, setShowSplash] = useState(true);
+
+    if (showSplash) {
+        return <SplashScreen onFinish={() => setShowSplash(false)} />;
+    }
+
     return (
-        <Stack>
+        <Stack
+            screenOptions={{
+                headerStyle: { backgroundColor: '#FFFFFF' },
+                headerTintColor: '#1E293B',
+                headerTitleStyle: { fontWeight: 'bold', color: '#1E293B' },
+                headerShadowVisible: false,
+            }}
+        >
             <Stack.Screen 
                 name="(tabs)" 
                 options={{ headerShown: false }} 
@@ -12,9 +27,6 @@ export default function RootLayout() {
                 options={{ 
                     title: "Detalles del Usuario",
                     headerShown: true,
-                    headerStyle: { backgroundColor: '#2563EB' },
-                    headerTintColor: '#fff',
-                    headerTitleStyle: { fontWeight: 'bold' },
                 }} 
             />
             <Stack.Screen 
@@ -22,9 +34,6 @@ export default function RootLayout() {
                 options={{ 
                     title: "Detalles del Usuario",
                     headerShown: true,
-                    headerStyle: { backgroundColor: '#2563EB' },
-                    headerTintColor: '#fff',
-                    headerTitleStyle: { fontWeight: 'bold' },
                 }} 
             />
             <Stack.Screen 
@@ -32,9 +41,6 @@ export default function RootLayout() {
                 options={{ 
                     title: "Editar Usuario",
                     headerShown: true,
-                    headerStyle: { backgroundColor: '#2563EB' },
-                    headerTintColor: '#fff',
-                    headerTitleStyle: { fontWeight: 'bold' },
                 }} 
             />
             <Stack.Screen 
@@ -42,9 +48,6 @@ export default function RootLayout() {
                 options={{ 
                     title: "Editar Usuario",
                     headerShown: true,
-                    headerStyle: { backgroundColor: '#2563EB' },
-                    headerTintColor: '#fff',
-                    headerTitleStyle: { fontWeight: 'bold' },
                 }} 
             />
         </Stack>

@@ -9,46 +9,30 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
-import Constants from 'expo-constants';
-
-const getApiUrl = () => {
-  if (Platform.OS === 'web') {
-    return 'http://localhost:5000/v1/usuarios/';
-  }
-
-  const hostUri =
-    Constants.expoConfig?.hostUri ||
-    Constants.manifest2?.extra?.expoClient?.hostUri ||
-    Constants.manifest?.debuggerHost;
-
-  if (hostUri) {
-    const ip = hostUri.split(':')[0];
-    if (ip && ip !== 'localhost' && ip !== '127.0.0.1') {
-      return `http://${ip}:5000/v1/usuarios/`;
-    }
-  }
-
-  return Platform.OS === 'android'
-    ? 'http://10.0.2.2:5000/v1/usuarios/'
-    : 'http://localhost:5000/v1/usuarios/';
-};
-
-const API_URL = getApiUrl();
+import { apiFetch, getApiErrorMessage } from '../config/api';
 
 export default function ConsultaUsuariosScreen() {
   const router = useRouter();
   const [usuarios, setUsuarios] = useState([]);
   const [cargando, setCargando] = useState(false);
+  const [errorApi, setErrorApi] = useState('');
 
   const obtenerUsuarios = async () => {
     try {
       setCargando(true);
-      const respuesta = await fetch(API_URL);
+      setErrorApi('');
+      const respuesta = await apiFetch();
+
+      if (!respuesta.ok) {
+        throw new Error(`Error en la petición: ${respuesta.status}`);
+      }
+
       const datos = await respuesta.json();
       console.log("Respuesta de la API:", datos);
       setUsuarios(datos.usuarios || []);
     } catch (error) {
       console.log("Error de la API:", error);
+      setErrorApi(getApiErrorMessage(error));
     } finally {
       setCargando(false);
     }
@@ -68,7 +52,7 @@ export default function ConsultaUsuariosScreen() {
       <View style={styles.linea}></View>
 
       <Text style={styles.info}>
-        Edad: {item.edad} años
+        Edad: {item.edad}
       </Text>
 
       <Pressable
@@ -97,6 +81,12 @@ export default function ConsultaUsuariosScreen() {
       <Text style={styles.titulo}>
         Lista de Usuarios
       </Text>
+
+      {errorApi ? (
+        <View style={styles.errorCard}>
+          <Text style={styles.errorTexto}>{errorApi}</Text>
+        </View>
+      ) : null}
 
       <FlatList
         data={usuarios}
@@ -180,6 +170,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6B7280',
     marginTop: 40,
+  },
+  errorCard: {
+    backgroundColor: '#FEE2E2',
+    borderColor: '#FCA5A5',
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 15,
+  },
+  errorTexto: {
+    color: '#991B1B',
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
   },
 
   botonDetalle: {
